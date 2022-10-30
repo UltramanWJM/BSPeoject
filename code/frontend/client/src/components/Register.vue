@@ -1,46 +1,54 @@
 <template>
     <div class="login-wrap">
       <el-form class="login-container">
-        <h1 class="title">用户登录</h1>
+        <h1 class="title">用户注册</h1>
         <el-form-item>
-          <el-input type="text" placeholder="用户账号" v-model="username" autocomplete="off"></el-input>
+          <el-input type="text" placeholder="用户账号" v-model="id" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-input type="text" placeholder="用户昵称" v-model="username" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-input type="text" placeholder="手机号码" v-model="phone" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
           <el-input type="password" placeholder="用户密码" v-model="password" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="doLogin" style="width: 100%;">登录</el-button>
+          <el-input type="password" placeholder="确认密码" v-model="password1" autocomplete="off"></el-input>
         </el-form-item>
-        <el-row style="text-align: center;margin-top: -10px;">
-          <el-link type="primary" @click="toRegister">用户注册</el-link>
-          <el-link type="primary">忘记密码</el-link>
-        </el-row>
+        <el-form-item>
+          <el-button type="primary" @click="doRegister" style="width: 48%;">注册</el-button>
+          <el-button type="primary" @click="toLogin" style="width: 48%;">返回登录</el-button>
+        </el-form-item>
       </el-form>
     </div>
   </template>
    
   <script>
-import axios from 'axios';
-
+  import axios from 'axios';
     export default {
       name: 'Login',
       data: function() {
         return {
+          id:'',
           username: '',
-          password: ''
+          password: '',
+          password1:'',
+          phone:''
         }
       },
       methods: {
-        doLogin:function(){
-          let username=this.username;
-          let password=this.password;
-          console.log("username=%s,password=%s",username,password);
+        doRegister:function(){
           let params = {
-            username: username,
-            password: password,
-            method: 'Login'
+            id: this.id,
+            username: this.username,
+            phone: this.phone,
+            password:this.password,
+            method: 'Register'
           };
-          const url = 'http://localhost:5000/login'
+          console.log(params);
+          const url = 'http://localhost:5000/register'
           axios.get(url, {params: params})
           .then((res) => {
             console.log(res);
@@ -54,8 +62,8 @@ import axios from 'axios';
             console.log(err);
           });
         },
-        toRegister:function(){
-          this.$router.push('/register');
+        toLogin:function(){
+          this.$router.push('/login');
         }
       }
     }
