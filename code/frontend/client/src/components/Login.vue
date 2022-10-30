@@ -3,7 +3,7 @@
       <el-form class="login-container">
         <h1 class="title">用户登录</h1>
         <el-form-item>
-          <el-input type="text" placeholder="用户账号" v-model="username" autocomplete="off"></el-input>
+          <el-input type="text" placeholder="用户ID" v-model="id" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
           <el-input type="password" placeholder="用户密码" v-model="password" autocomplete="off"></el-input>
@@ -26,17 +26,17 @@ import axios from 'axios';
       name: 'Login',
       data: function() {
         return {
-          username: '',
+          id: '',
           password: ''
         }
       },
       methods: {
         doLogin:function(){
-          let username=this.username;
+          let id=this.id;
           let password=this.password;
-          console.log("username=%s,password=%s",username,password);
+          console.log("id=%s,password=%s",id,password);
           let params = {
-            username: username,
+            id: id,
             password: password,
             method: 'Login'
           };
@@ -49,6 +49,14 @@ import axios from 'axios';
                 message: res.data.msg,
                 type: res.data.code == 1 ? 'success' : 'error'
             });
+            if (res.data.code == 1) {
+              localStorage.setItem('id', id)
+              localStorage.setItem('password', password)
+              localStorage.setItem('username', res.data.name)
+              localStorage.setItem('phone', res.data.phone)
+              this.$router.push('/user');
+              // console.log(localStorage.getItem('username'))
+            }
           })
           .catch((err) => {
             console.log(err);
@@ -67,7 +75,7 @@ import axios from 'axios';
       width: 100%;
       height: 100%;
       padding-top: 10%;
-      background-color: #112346;
+      background-color: #D3D3D3;
       background-repeat: no-repeat;
       background-position: center right;
       background-size: 100%;

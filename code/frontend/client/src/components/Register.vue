@@ -75,7 +75,7 @@
       width: 100%;
       height: 100%;
       padding-top: 10%;
-      background-color: #112346;
+      background-color: #D3D3D3;
       background-repeat: no-repeat;
       background-position: center right;
       background-size: 100%;
