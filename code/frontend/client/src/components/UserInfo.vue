@@ -18,13 +18,14 @@
         <el-col :span="12">
             <el-input type="text" placeholder="phone" v-model="phone" class="input"></el-input>
         </el-col>
-        <el-col :span="3" style="margin-left:25px"><el-button type="info"><span>确定</span></el-button></el-col>
+        <el-col :span="3" style="margin-left:25px"><el-button type="info" @click="modPhone"><span>确定</span></el-button></el-col>
     </el-row>
     <el-row style="margin-top:60px">
         <el-col :span="5"><div class="label">用户密码</div></el-col>
         <el-col :span="12">
-            <el-input type="text" placeholder="newPassword" v-model="newPassword" class="input"></el-input>
+            <el-input type="password" placeholder="newPassword" v-model="newPassword" class="input"></el-input>
         </el-col>
+        <el-col :span="3" style="margin-left:25px"><el-button type="info" @click="modPwd"><span>确定</span></el-button></el-col>
     </el-row>
 </div>
 </template>
@@ -57,6 +58,7 @@ export default {
                 localStorage.setItem('phone', res.data.phone)
                 this.username = res.data.name
                 this.phone = res.data.phone
+                console.log(res)
             })
             .catch((err) => {
             console.log(err);
@@ -64,7 +66,7 @@ export default {
             localStorage.setItem
         },
         modName() {
-            console.log(this.username)
+            // console.log(this.username)
             let params = {
                 id: this.id,
                 name: this.username,
@@ -77,22 +79,90 @@ export default {
                 this.$message({
                 message: res.data.msg,
                 type: res.data.code == 1 ? 'success' : 'error'
-            })
-                // this.updateLocal()
+                })
+                this.updateLocal()
             }).catch((err) => {
             console.log(err);
           });
+        },
+        modPhone() {
+            // console.log(this.username)
+            let params = {
+                id: this.id,
+                phone: this.phone,
+                type: 1 // 1 means modify phone
+            }
+            let url = 'http://localhost:5000/modusr'
+            axios.get(url, {params: params})
+            .then((res) => {
+                console.log(res)
+                this.$message({
+                message: res.data.msg,
+                type: res.data.code == 1 ? 'success' : 'error'
+                })
+                this.updateLocal()
+            }).catch((err) => {
+            console.log(err);
+          });
+        },
+        modPwd() {
+            this.$prompt('请输入旧密码', '提示', {
+                comfirmButtonText: '确定',
+                cancelButtonText: '取消'
+                // inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+                // inputErrorMessage: '邮箱格式不正确'
+            }).then(({ value }) => {
+                // this.$message({
+                //     type: 'success',
+                //     message: '' + value
+                // });
+                if (value != localStorage.getItem('password')) {
+                    throw new Error('密码错误')
+                }
+                else {
+                    let params = {
+                        id: this.id,
+                        password: this.newPassword,
+                        type: 2 // 2 means modify password
+                    };
+                    let url = 'http://localhost:5000/modusr'
+                    axios.get(url, {params: params})
+                    .then((res) => {
+                        console.log(res)
+                        this.$message({
+                        message: res.data.msg,
+                        type: res.data.code == 1 ? 'success' : 'error'
+                        })
+                        this.updateLocal()
+                    }).catch((err) => {
+                    console.log(err);
+                    });
+                }
+            }).catch((err) => {
+                if (err.message == '密码错误') {
+                    this.$message({
+                        type: 'error',
+                        message: err.message
+                    });
+                }
+                else {
+                    this.$message({
+                        type: 'info',
+                        message: '取消输入'
+                    });
+                }
+            });
         }
     },
     mounted:function() {
         this.id = localStorage.getItem('id')
         this.username = localStorage.getItem('username')
         this.phone = localStorage.getItem('phone')
-    },
-    updated:function() {
-        console.log("flash!!!!!!!!!!!!!!")
-        this.updateLocal()
     }
+    // updated:function() {
+    //     console.log("flash!!!!!!!!!!!!!!")
+    //     this.updateLocal()
+    // }
 }
 </script>
 

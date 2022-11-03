@@ -6,7 +6,7 @@
             <el-menu background-color="#404040" text-color="#ffffff" active-text-color="#ffd04b"
             default-active="1" @open="handleOpen" @close="handleClose" @select="handleSelect">
                 <el-menu-item index="/user/info">个人信息</el-menu-item>
-                <el-menu-item index="/user">家具管理</el-menu-item>
+                <el-menu-item index="/user/scene">场景管理</el-menu-item>
                 <el-menu-item index="/user">我是测试</el-menu-item>
                 <el-submenu index="4">
                     <template slot="title">多级菜单测试</template>

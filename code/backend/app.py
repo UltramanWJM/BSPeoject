@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request, flash
 from flask_cors import CORS
 from initDatabase import createApp
 from initDatabase import db
-from models import Users
+from models import Users, Scenes
 from flask_sqlalchemy import SQLAlchemy
 
 app = createApp()
@@ -74,18 +74,24 @@ def modusr():
     id = data.get('id')
     type = int(data.get('type'))
     user = Users.query.filter(Users.id == id).first()
-    if type == 0: # modify name
-        user.username = data.get('name')
-        # print(user.username)
-    elif type == 1: # modify phone
-        user.phone = data.get('phone')
-    elif type == 2: # modify password
-        user.password = data.get('password')
-    db.session.commit()
     res = {
         "code": 1,
         "msg": "Modify Success!"
     }
+    if type == 0: # modify name
+        user.username = data.get('name')
+        # print(user.username)
+    elif type == 1: # modify phone
+        phone = data.get('phone')
+        isExist = Users.query.filter(Users.phone == phone).first()
+        if isExist:
+            res['code'] = 0
+            res['msg'] = "Already exist the phone number!"
+            return res
+        user.phone = data.get('phone')
+    elif type == 2: # modify password
+        user.password = data.get('password')
+    db.session.commit()
     return res
 
 
@@ -102,6 +108,56 @@ def getUserinfo():
         "password": user.password
     }
     return res
+
+@app.route('/storeimg', methods=['GET', 'POST'])
+def storeImg():
+    img = request.files.get('file')
+    path = "./imgs/"
+    imgName = img.filename
+    filePath = path + imgName
+    img.save(filePath)
+    return filePath
+
+@app.route('/createscene', methods=['GET', 'POST'])
+def createScene():
+    data = request_parse(request)
+    sceneId = data.get('newSceneId')
+    sceneName = data.get('newSceneName')
+    userId = data.get('userId')
+    imgPath = data.get('image')
+    scenes = Scenes.query.filter(Scenes.sceneId == sceneId).first()
+    res = {
+        "code": 1,
+        "msg": ""
+    }
+    if (scenes):
+        res["code"] = 0
+        res["msg"] = "Already exist scenesID " + sceneId
+        return res
+    newScene = Scenes(sceneId=sceneId, sceneName=sceneName, userId=userId, imgPath=imgPath, deviceNumber=0)
+    db.session.add(newScene)
+    db.session.commit()
+    res["msg"] = "新场景创建成功"
+    return res
+
+@app.route('/getscenes', methods=['GET', 'POST'])
+def getScenes():
+    data = request_parse(request)
+    userId = data.get('userId')
+    scenes = Scenes.query.filter(Scenes.userId == userId).all()
+    ret = {
+        "code": 1,
+        "data": []
+    }
+    for scene in scenes:
+        sce = {
+            "sceneId": scene.sceneId,
+            "sceneName": scene.sceneName,
+            "deviceNum": scene.deviceNumber
+        }
+        ret.get('data').append(sce)
+        print(sce)
+    return ret
 
 if __name__ == '__main__':
     app.run()

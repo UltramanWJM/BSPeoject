@@ -6,6 +6,7 @@ import Login from '../components/Login.vue'
 import Register from '../components/Register.vue'
 import UserInfo from '../components/UserInfo.vue'
 import User from '../components/User.vue'
+import SceneInfo from '../components/SceneInfo.vue'
 
 Vue.use(Router)
 
@@ -40,6 +41,11 @@ export default new Router({
           path: 'info',
           name: 'UserInfo',
           component: UserInfo
+        },
+        {
+          path: 'scene',
+          name: 'SceneInfo',
+          component: SceneInfo
         }
       ]
     }
