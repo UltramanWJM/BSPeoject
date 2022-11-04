@@ -14,7 +14,7 @@
                     </el-form>
                 </div>
                 <div class="table">
-                    <el-table :data="tableData" stripe broder>
+                    <el-table :data="tableData" broder>
                         <el-table-column
                         label="序号" 
                         type="index" 
@@ -39,8 +39,8 @@
                         </el-table-column>
                         <el-table-column fixed="right" label="操作" width="100">
                             <template slot-scope="scope">
-                                <el-button type="text" size="small">查看</el-button>
-                                <el-button type="text" size="small">编辑</el-button>
+                                <el-button type="text" size="small" @click="showScene(scope.$index, scope.row)">查看</el-button>
+                                <el-button type="text" size="small" @click="deleteScene(scope.$index, scope.row)">删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -48,12 +48,14 @@
             </el-col>
         </el-row>
         <AddScene :dialogAdd="dialogAdd" @update="getScenes"></AddScene>
+        <ShowScene :dialogShow="dialogShow"></ShowScene> 
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 import AddScene from './CreateScene.vue'
+import ShowScene from './ShowScene.vue'
 export default {
     name: 'SceneInfo',
     data() {
@@ -63,13 +65,18 @@ export default {
             username: '',
             phone: '',
             searchSceneId: '',
-            dialogAdd:{
-                show:false
+            dialogAdd: {
+                show: false
+            },
+            dialogShow: {
+                show: false,
+                imgUrl: ''
             }
         }
     },
     components: {
-        AddScene
+        AddScene,
+        ShowScene
     },
     methods: {
         getScenes() {
@@ -79,12 +86,57 @@ export default {
             }
             axios.get(url, {params: params})
             .then((res) => {
-                console.log(res)
-                this.tableData = res.data
+                console.log(res.data)
+                this.tableData = res.data.data
             });
         },
-        handleAdd(){  //添加
+        handleAdd() {  //添加
             this.dialogAdd.show = true;
+        },
+        deleteScene(index, row) {
+            let params = {
+                sceneId: row.sceneId
+            };
+            let url = "http://127.0.0.1:5000/deletescene"
+            axios.get(url, {params: params})
+            .then((res) => {
+                this.$message({
+                message: res.data.msg,
+                type: res.data.code == 1 ? 'success' : 'error'
+                });
+                this.getScenes()
+            })
+        },
+        showScene(index, row) {
+            this.getSceneImg(row.sceneId);
+            this.dialogShow.show = true;
+        },
+        getSceneImg(sceneId) {
+            let url = 'http://127.0.0.1:5000/getsceneimg'
+            let params = {
+                sceneId: sceneId
+            }
+            axios({
+                method: 'post',
+                url: url,
+                data: params,
+                responseType: "arraybuffer"
+            })
+            .then((res) => {
+                console.log(res);
+                this.dialogShow.imgUrl = "data:image/jpeg;base64," + this.arrayBufferToBase64(res.data);
+            });
+        },
+        arrayBufferToBase64(buffer) {
+            //第一步，将ArrayBuffer转为二进制字符串
+            var binary = "";
+            var bytes = new Uint8Array(buffer);
+            var len = bytes.byteLength;
+            for (var i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            //将二进制字符串转为base64字符串
+            return window.btoa(binary);
         }
     },
     mounted: function() {

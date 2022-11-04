@@ -1,10 +1,12 @@
 import json
 
-from flask import Flask, jsonify, request, flash
+from flask import Flask, jsonify, request, flash, send_file, make_response
 from flask_cors import CORS
 from initDatabase import createApp
 from initDatabase import db
 from models import Users, Scenes
+import os, random, io
+from PIL import Image
 from flask_sqlalchemy import SQLAlchemy
 
 app = createApp()
@@ -114,7 +116,9 @@ def storeImg():
     img = request.files.get('file')
     path = "./imgs/"
     imgName = img.filename
-    filePath = path + imgName
+    rad = random.randrange(0, 1000)
+    i = imgName.index('.')
+    filePath = path + imgName[0:i] + str(rad) + imgName[i:]
     img.save(filePath)
     return filePath
 
@@ -158,6 +162,34 @@ def getScenes():
         ret.get('data').append(sce)
         print(sce)
     return ret
+
+@app.route('/deletescene', methods=['POST', 'GET'])
+def deleteScene():
+    data = request_parse(request)
+    sceneId = data.get('sceneId')
+    scenes = Scenes.query.filter(Scenes.sceneId == sceneId).all()
+    for scene in scenes:
+        path = scene.imgPath
+        os.remove(path)
+        db.session.delete(scene)
+    db.session.commit()
+    return jsonify(code=1, msg="删除场景成功！")
+
+@app.route('/getsceneimg', methods=['GET', 'POST'])
+def getSceneImg():
+    data = request_parse(request)
+    sceneId = data.get('sceneId')
+    scene = Scenes.query.filter(Scenes.sceneId == sceneId).first()
+    path = scene.imgPath
+    imageData = open(path, "rb").read()
+    # res = make_response(imageData)
+    # res.headers['Content-Type'] = 'image/png'
+    imgStream = io.BytesIO(imageData)
+    img = Image.open(imgStream)
+    imgByteArr = io.BytesIO()
+    img.save(imgByteArr, format='PNG')
+    imgByteArr = imgByteArr.getvalue()
+    return imgByteArr
 
 if __name__ == '__main__':
     app.run()

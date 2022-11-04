@@ -80,6 +80,7 @@ import axios from 'axios'
                     if (res.data.code == 1) {
                         this.dialogAdd.show = false;
                         this.resetForm(formName);
+                        this.$emit('update');
                     }
                     
                 })
@@ -89,7 +90,6 @@ import axios from 'axios'
       UploadImg(file, fileList) {
         let fd = new FormData()
         fd.append('file', file.raw)
-        console.log(file, fileList)
         let url = 'http://localhost:5000/storeimg'
         axios.post(url, fd, {headers: {'Content-Type': 'multipart/form-data'}})
         .then((res) => {
