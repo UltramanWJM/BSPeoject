@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request, flash, send_file, make_response
 from flask_cors import CORS
 from initDatabase import createApp
 from initDatabase import db
-from models import Users, Scenes
+from models import Users, Scenes, Devices
 import os, random, io
 from PIL import Image
 from flask_sqlalchemy import SQLAlchemy
@@ -190,6 +190,90 @@ def getSceneImg():
     img.save(imgByteArr, format='PNG')
     imgByteArr = imgByteArr.getvalue()
     return imgByteArr
+
+@app.route('/getcreatedscenes', methods=['GET'])
+def getCreatedScenes():
+    data = request_parse(request)
+    userId = data.get('userId')
+    scenes = Scenes.query.filter(Scenes.userId == userId).all()
+    ret = {
+        "code": 1,
+        "data": []
+    }
+    for scene in scenes:
+        sce = {
+            "value": scene.sceneId,
+            "label": scene.sceneName
+        }
+        ret.get('data').append(sce)
+        print(sce)
+    return ret
+
+@app.route('/getdevices', methods=['GET', 'POST'])
+def getDevices():
+    data = request_parse(request)
+    userId = data.get('userId')
+    devices = Devices.query.filter(Devices.userId == userId).all()
+    ret = {
+        "code": 1,
+        "data": []
+    }
+    for device in devices:
+        dT = '啥也不是'
+        if device.deviceType == 0:
+            dT = "灯"
+        elif device.deviceType == 1:
+            dT = "开关"
+        elif device.deviceType == 2:
+            dT = "传感器"
+        elif device.deviceType == 3:
+            dT = "门锁"
+        dev = {
+            "deviceId": device.deviceId,
+            "deviceName": device.deviceName,
+            "deviceType": dT,
+            "sceneId": device.sceneId
+        }
+        ret.get('data').append(dev)
+        print(dev)
+    return ret
+
+@app.route('/deletedevice', methods=['POST', 'GET'])
+def deleteDevice():
+    data = request_parse(request)
+    deviceId = data.get('deviceId')
+    devices = Devices.query.filter(Devices.deviceId == deviceId).all()
+    for device in devices:
+        db.session.delete(device)
+    db.session.commit()
+    return jsonify(code=1, msg="删除设备成功！")
+
+@app.route('/createdevice', methods=['GET', 'POST'])
+def createDevice():
+    data = request_parse(request)
+    deviceId = data.get('newDeviceId')
+    deviceName = data.get('newDeviceName')
+    userId = data.get('userId')
+    deviceType = data.get('newDeviceType')
+    sceneId = data.get('newDeviceScene')
+    positionX = data.get('newDevicePX')
+    positionY = data.get('newDevicePY')
+    devices = Devices.query.filter(Devices.deviceId == deviceId).all()
+    res = {
+        "code": 1,
+        "msg": ""
+    }
+    if (devices):
+        res["code"] = 0
+        res["msg"] = "Already exist DeviceID " + sceneId
+        return res
+    newDevice = Devices(deviceId=sceneId, deviceName=deviceName, userId=userId, sceneId=sceneId, deviceType=deviceType, positionX=positionX, positionY=positionY)
+    db.session.add(newDevice)
+    scene = Scenes.query.filter(Scenes.sceneId == sceneId).first()
+    scene.deviceNumber = scene.deviceNumber + 1
+    db.session.commit()
+    res["msg"] = "新设备创建成功"
+    return res
 
 if __name__ == '__main__':
     app.run()

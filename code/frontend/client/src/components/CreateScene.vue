@@ -44,7 +44,7 @@
 import axios from 'axios'
 
   export default {
-    name: 'AddUser',
+    name: 'AddScene',
     props:{
       dialogAdd:Object
     },

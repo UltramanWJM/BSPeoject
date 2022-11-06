@@ -1,6 +1,6 @@
 <template>
     <div class="scenes">
-        <h2 style="margin-top: -5px"><font color="white"> 场景管理界面 </font></h2>
+        <h2 style="margin-top: -5px"><font color="white"> 设备管理界面 </font></h2>
         <el-row>
             <el-col :span="22" :push="0">
                 <div>
@@ -21,40 +21,46 @@
                         width="100">
                         </el-table-column>
                         <el-table-column
-                            label="场景ID"
+                            label="设备ID"
                             align="center"
                             width="200"
-                            prop="sceneId">
+                            prop="deviceId">
                         </el-table-column>
                         <el-table-column
-                            label="场景名称"
+                            label="设备名称"
                             align="center"
                             width="400"
-                            prop="sceneName">
+                            prop="deviceName">
                         </el-table-column>
                         <el-table-column
-                            label="设备数"
+                            label="设备类型"
+                            width="400"
                             align="center"
-                            prop="deviceNum">
+                            prop="deviceType">
+                        </el-table-column>
+                        <el-table-column
+                            label="所属场景ID"
+                            align="center"
+                            prop="sceneId">
                         </el-table-column>
                         <el-table-column fixed="right" label="操作" width="100">
                             <template slot-scope="scope">
                                 <el-button type="text" size="small" @click="showScene(scope.$index, scope.row)">查看</el-button>
-                                <el-button type="text" size="small" @click="deleteScene(scope.$index, scope.row)">删除</el-button>
+                                <el-button type="text" size="small" @click="deleteDevice(scope.$index, scope.row)">删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
                 </div>
             </el-col>
         </el-row>
-        <AddScene :dialogAdd="dialogAdd" @update="getScenes"></AddScene>
+        <AddDevice :dialogAdd="dialogAdd" @update="getDevices"></AddDevice>
         <ShowScene :dialogShow="dialogShow"></ShowScene> 
     </div>
 </template>
 
 <script>
 import axios from 'axios';
-import AddScene from './CreateScene.vue'
+import AddDevice from './CreateDevice.vue'
 import ShowScene from './ShowScene.vue'
 export default {
     name: 'SceneInfo',
@@ -66,7 +72,8 @@ export default {
             phone: '',
             searchSceneId: '',
             dialogAdd: {
-                show: false
+                show: false,
+                scenes: []
             },
             dialogShow: {
                 show: false,
@@ -75,12 +82,12 @@ export default {
         }
     },
     components: {
-        AddScene,
+        AddDevice,
         ShowScene
     },
     methods: {
-        getScenes() {
-            let url = 'http://127.0.0.1:5000/getscenes'
+        getDevices() {
+            let url = 'http://127.0.0.1:5000/getdevices'
             let params = {
                 userId: localStorage.getItem('id')
             }
@@ -91,20 +98,21 @@ export default {
             });
         },
         handleAdd() {  //添加
+            this.getCreatedScenes();
             this.dialogAdd.show = true;
         },
-        deleteScene(index, row) {
+        deleteDevice(index, row) {
             let params = {
-                sceneId: row.sceneId
+                deviceId: row.deviceId
             };
-            let url = "http://127.0.0.1:5000/deletescene"
+            let url = "http://127.0.0.1:5000/deletedevice"
             axios.get(url, {params: params})
             .then((res) => {
                 this.$message({
                 message: res.data.msg,
                 type: res.data.code == 1 ? 'success' : 'error'
                 });
-                this.getScenes()
+                this.getDevices()
             })
         },
         showScene(index, row) {
@@ -137,10 +145,20 @@ export default {
             }
             //将二进制字符串转为base64字符串
             return window.btoa(binary);
+        },
+        getCreatedScenes() {
+            let params = {
+                userId: localStorage.getItem('id')
+            };
+            let url = 'http://127.0.0.1:5000/getcreatedscenes'
+            axios.get(url, {params: params})
+            .then((res) => {
+                this.dialogAdd.scenes = res.data.data
+            });
         }
     },
     mounted: function() {
-        this.getScenes();
+        this.getDevices();
     }
 }
 </script>
@@ -149,4 +167,9 @@ export default {
 .form .el-form-item__label{
     color: white;
 }
+/* .marker {
+    position: absolute;
+    z-index: 999;
+    border-radius: 50%;
+  } */
 </style>

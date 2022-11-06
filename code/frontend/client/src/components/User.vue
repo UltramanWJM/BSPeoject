@@ -7,7 +7,7 @@
             default-active="1" @open="handleOpen" @close="handleClose" @select="handleSelect">
                 <el-menu-item index="/user/info">个人信息</el-menu-item>
                 <el-menu-item index="/user/scene">场景管理</el-menu-item>
-                <el-menu-item index="/user">我是测试</el-menu-item>
+                <el-menu-item index="/user/device">设备管理</el-menu-item>
                 <el-submenu index="4">
                     <template slot="title">多级菜单测试</template>
                     <el-menu-item index="/user">啊哈</el-menu-item>
