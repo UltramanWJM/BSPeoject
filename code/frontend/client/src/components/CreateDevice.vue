@@ -209,7 +209,7 @@ import axios from 'axios'
             var img = document.getElementById('biaozhu');
             let width = img.width;
             let height = img.height;
-            // console.log(width, height);
+            console.log(width, height);
             this.formData.newDevicePX = event.offsetX / width;
             this.formData.newDevicePY = event.offsetY / height;
             console.log(this.formData.newDevicePX, this.formData.newDevicePY)

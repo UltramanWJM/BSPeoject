@@ -54,14 +54,14 @@
             </el-col>
         </el-row>
         <AddDevice :dialogAdd="dialogAdd" @update="getDevices"></AddDevice>
-        <ShowScene :dialogShow="dialogShow"></ShowScene> 
+        <ShowScene :dialogShow="dialogShow" ref="DP"></ShowScene> 
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 import AddDevice from './CreateDevice.vue'
-import ShowScene from './ShowScene.vue'
+import ShowScene from './ShowDevice.vue'
 export default {
     name: 'SceneInfo',
     data() {
@@ -77,7 +77,9 @@ export default {
             },
             dialogShow: {
                 show: false,
-                imgUrl: ''
+                imgUrl: '',
+                pX: '',
+                pY: ''
             }
         }
     },
@@ -118,6 +120,9 @@ export default {
         showScene(index, row) {
             this.getSceneImg(row.sceneId);
             this.dialogShow.show = true;
+            this.getDevice(row.deviceId);
+            // this.showDevPos(this.dialogShow.pX, this.dialogShow.pY)
+            
         },
         getSceneImg(sceneId) {
             let url = 'http://127.0.0.1:5000/getsceneimg'
@@ -155,7 +160,36 @@ export default {
             .then((res) => {
                 this.dialogAdd.scenes = res.data.data
             });
-        }
+        },
+        getDevice(deviceId) {
+            let params = {
+                deviceId: deviceId
+            };
+            let url = 'http://127.0.0.1:5000/getdevice'
+            axios.get(url, {params: params})
+            .then((res) => {
+                this.dialogShow.pX = res.data.positionX;
+                this.dialogShow.pY = res.data.positionY;
+            })
+        },
+    //     showDevPos(x, y) {
+    //         // var div = document.createElement('div');
+    //         // div.className = 'marker';
+    //         // div.id = 'marker0';
+    //         let img = document.getElementById('devPos')
+    //         let width = img.width;
+    //         let height = img.height;
+
+    //         var div = document.getElementById('mmark')
+    //         x = x * width + document.getElementById('devPos').offsetLeft - 5;
+    //         y = y * height + document.getElementById('devPos').offsetTop - 5;
+    //         div.style.width = '10px';
+    //         div.style.height = '10px';
+    //         div.style.backgroundColor = 'red';
+    //         div.style.left = x + 'px';
+    //         div.style.top = y + 'px';
+    //         // document.getElementById('biaozhuDiv').appendChild(div);
+    //    }
     },
     mounted: function() {
         this.getDevices();

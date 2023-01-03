@@ -9,7 +9,7 @@
                             <el-input v-model="searchSceneId" placeholder="查询设备ID"></el-input>
                         </el-form-item>
                         <el-form-item style="float: right">
-                            <el-button type="primary" @click="handleAdd">创建设备</el-button>
+                            <el-button type="primary" @click="handleAdd">创建场景</el-button>
                         </el-form-item>
                     </el-form>
                 </div>

@@ -8,6 +8,10 @@ import UserInfo from '../components/UserInfo.vue'
 import User from '../components/User.vue'
 import SceneInfo from '../components/SceneInfo.vue'
 import DeviceInfo from '../components/DeviceInfo.vue'
+import Lamp from '../components/Lamp.vue'
+import Switch from '../components/Switch.vue'
+import Sensor from '../components/Sensor.vue'
+import Lock from '../components/Lock.vue'
 
 Vue.use(Router)
 
@@ -52,6 +56,33 @@ export default new Router({
           path:'device',
           name: 'DeviceInfo',
           component: DeviceInfo
+        }
+      ]
+    },
+    {
+      path: '/device',
+      name: 'Device',
+      component: User,
+      children:[
+        {
+          path: 'lamp',
+          name: 'Lamp',
+          component: Lamp
+        },
+        {
+          path: 'switch',
+          name: 'Switch',
+          component: Switch
+        },
+        {
+          path: 'sensor',
+          name: 'Sensor',
+          component: Sensor
+        },
+        {
+          path:'lock',
+          name: 'Lock',
+          component: Lock
         }
       ]
     }

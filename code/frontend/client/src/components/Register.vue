@@ -1,21 +1,21 @@
 <template>
     <div class="login-wrap">
-      <el-form class="login-container">
+      <el-form :model="formData" :rules="rules" class="login-container" >
         <h1 class="title">用户注册</h1>
-        <el-form-item>
-          <el-input type="text" placeholder="用户账号" v-model="id" autocomplete="off"></el-input>
+        <el-form-item prop="id">
+          <el-input type="text" placeholder="用户账号" v-model="formData.id" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-input type="text" placeholder="用户昵称" v-model="username" autocomplete="off"></el-input>
+        <el-form-item prop="username">
+          <el-input type="text" placeholder="用户昵称" v-model="formData.username" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-input type="text" placeholder="手机号码" v-model="phone" autocomplete="off"></el-input>
+        <el-form-item prop="phone">
+          <el-input type="text" placeholder="手机号码" v-model="formData.phone" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-input type="password" placeholder="用户密码" v-model="password" autocomplete="off"></el-input>
+        <el-form-item prop="password">
+          <el-input type="password" placeholder="用户密码" v-model="formData.password" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-input type="password" placeholder="确认密码" v-model="password1" autocomplete="off"></el-input>
+        <el-form-item prop="password1">
+          <el-input type="password" placeholder="确认密码" v-model="formData.password1" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="doRegister" style="width: 48%;">注册</el-button>
@@ -30,21 +30,82 @@
     export default {
       name: 'Login',
       data: function() {
+        var checkId = (rule, value, callback) => {
+          let idReg = /^[0][0-9]+$/
+          if (!value) {
+            callback()
+          } else {
+            if (idReg.test(value)) {
+              callback(new Error("ID格式: 6-9位的纯数字，不得以0开头"))
+            }
+          }
+        }
+        var checkPassword = (rule, value, callback) => {
+          if (value === '') {
+            callback(new Error('请再次输入密码'))
+          } else if (value !== this.formData.password) {
+            callback(new Error('两次输入密码不一致！'))
+          } else {
+            callback()
+          }
+        }
+        var checkPhone = (rule, value, callback) => {
+          let phoneReg = /1[3|4|5|6|7|8|9][0-9]{9}$/
+          if (!value) {
+            callback()
+          } else {
+            if (phoneReg.test(value)) {
+              callback()
+            } else {
+              callback(new Error("电话格式:13、14、15、17、18、19开头 + 9位阿拉伯数字"))
+            }
+          }
+        }
+
         return {
-          id:'',
-          username: '',
-          password: '',
-          password1:'',
-          phone:''
+          // id:'',
+          // username: '',
+          // password: '',
+          // password1:'',
+          // phone:'',
+
+          formData:{
+            id: '',
+            username: '',
+            password: '',
+            password1: '',
+            phone: ''
+          },
+          rules: {
+            id: [
+              {required: true, message: "请输入ID", trigger: "blur"},
+              {min: 6, max: 9, message: "长度在6到9个字符", trigger: "blur"},
+              {validator: checkId, trigger: "blur"}
+            ],
+            password: [
+              {required: true, message: "请输入密码", trigger: "blur"},
+              {min: 6, max: 30, message: "长度在6到30个字符", trigger: "blur"}
+            ],
+            password1: [
+              {validator: checkPassword, trigger: "blur"}
+            ],
+            phone: [
+              {required: true, message: "请输入电话号码", trigger: "blur"},
+              {validator: checkPhone, trigger: "blur"}
+            ],
+            username: [
+              {required: true, message: "请输入用户昵称", trigger: "blur"}
+            ]
+          }
         }
       },
       methods: {
         doRegister:function(){
           let params = {
-            id: this.id,
-            username: this.username,
-            phone: this.phone,
-            password:this.password,
+            id: this.formData.id,
+            username: this.formData.username,
+            phone: this.formData.phone,
+            password: this.formData.password,
             method: 'Register'
           };
           console.log(params);

@@ -9,9 +9,11 @@
                 <el-menu-item index="/user/scene">场景管理</el-menu-item>
                 <el-menu-item index="/user/device">设备管理</el-menu-item>
                 <el-submenu index="4">
-                    <template slot="title">多级菜单测试</template>
-                    <el-menu-item index="/user">啊哈</el-menu-item>
-                    <el-menu-item index="/user">我日</el-menu-item>
+                    <template slot="title">设备信息详情</template>
+                    <el-menu-item index="/device/lamp">灯</el-menu-item>
+                    <el-menu-item index="/device/switch">开关</el-menu-item>
+                    <el-menu-item index="/device/sensor">传感器</el-menu-item>
+                    <el-menu-item index="/device/lock">门锁</el-menu-item>
                 </el-submenu>
             </el-menu>
         </div>
